@@ -1,0 +1,7 @@
+Flask
+Pillow
+requests
+pytz
+beautifulsoup4
+tyme4py
+qrcode

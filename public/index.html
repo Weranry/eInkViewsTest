@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eInkViews</title>
+    <style>
+        :root {
+            --primary-color: #6e5494;
+            --primary-color-light: #8a6db1;
+            --primary-color-dark: #5a4378;
+            --text-color: #24292e;
+            --text-color-light: #586069;
+            --border-color: #e1e4e8;
+            --code-bg-color: #f6f8fa;
+            --content-width: 960px;
+            --github-black: #24292e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            color: var(--text-color);
+            line-height: 1.6;
+            background-color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.25;
+            margin-bottom: 0.5rem; /* Reduced from 1rem */
+        }
+
+        h1 {
+            font-size: 2.2rem;
+        }
+
+        h2 {
+            font-size: 1.65rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-top: 1.5rem; /* Reduced from 2rem */
+        }
+
+        h3 {
+            font-size: 1.35rem;
+        }
+
+        p {
+            margin: 0.5rem 0; /* Reduced from 1rem */
+        }
+
+        code {
+            font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+            padding: 0.25rem 0.5rem;
+            background-color: var(--code-bg-color);
+            border-radius: 3px;
+        }
+
+        pre {
+            background-color: var(--code-bg-color);
+            padding: 0.75rem; /* Reduced from 1rem */
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 0.75rem 0; /* Reduced from 1rem */
+        }
+
+        pre code {
+            padding: 0;
+            background-color: transparent;
+        }
+
+        ul, ol {
+            padding-left: 1.2em;
+            margin: 0.75rem 0; /* Reduced from 1rem */
+        }
+
+        /* 布局样式 */
+        .container {
+            max-width: var(--content-width);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            /* Added for better vertical spacing */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 头部样式 */
+        .header {
+            text-align: center;
+            padding: 1.5rem 0; /* Reduced from 3rem */
+        }
+
+        .logo-container {
+            margin-bottom: 1rem; /* Reduced from 1.5rem */
+        }
+
+        .logo {
+            width: 100px; /* Reduced from 120px */
+            height: auto;
+            margin-bottom: 0.5rem; /* Reduced from 1rem */
+        }
+
+        .title {
+            font-size: 3.5rem; /* Reduced from 3rem */
+            color: var(--text-color);
+            margin-bottom: 0.25rem; /* Reduced from 0.5rem */
+            font-family: 'Times New Roman', Times, serif;
+        }
+
+        .description {
+            font-size: 1.2rem; /* Reduced from 1.4rem */
+            color: var(--text-color-light);
+            margin-bottom: 1.5rem; /* Reduced from 2rem */
+        }
+
+        /* 按钮样式 */
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0; /* Reduced from 2rem */
+        }
+
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.6rem 1.25rem; /* Reduced from 0.75rem 1.5rem */
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .button-github {
+            background-color: var(--github-black);
+            color: white;
+        }
+
+        .button-github:hover {
+            background-color: #3a3a3a;
+            text-decoration: none;
+        }
+
+        .button-outline {
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .button-outline:hover {
+            background-color: rgba(110, 84, 148, 0.1);
+            text-decoration: none;
+        }
+
+        /* GitHub图标（保留原样式以兼容旧实现） */
+        .github-icon {
+            display: inline-block;
+            width: 18px; /* Reduced from 20px */
+            height: 18px; /* Reduced from 20px */
+            margin-right: 6px; /* Reduced from 8px */
+            background-color: white;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .github-icon::before {
+            content: "";
+            position: absolute;
+            top: 5px; /* Adjusted from 6px */
+            left: 5px; /* Adjusted from 6px */
+            width: 8px;
+            height: 8px;
+            background-color: var(--github-black);
+            border-radius: 50%;
+        }
+
+        .github-icon::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 5px; /* Reduced from 6px */
+            height: 5px; /* Reduced from 6px */
+            border: 2px solid var(--github-black);
+            border-radius: 2px;
+            transform: rotate(45deg);
+        }
+
+        /* 新增：通用 SVG 图标样式 */
+        svg.icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 6px;
+            vertical-align: -3px;
+            fill: currentColor; /* 继承文字颜色，便于深浅模式统一 */
+        }
+
+        /* 分隔线 */
+        .divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 1.5rem 0; /* Reduced from 3rem */
+        }
+
+        /* 特性部分 */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem; /* Reduced from 2rem */
+            margin: 1.5rem 0; /* Reduced from 3rem */
+        }
+
+        .feature {
+            padding: 1rem; /* Reduced from 1.5rem */
+            text-align: center; /* Added for better centering */
+        }
+
+        .feature-title {
+            font-weight: 600;
+            font-size: 1.2rem; /* Reduced from 1.4rem */
+            margin-bottom: 0.5rem; /* Reduced from 1rem */
+            color: var(--primary-color);
+        }
+
+        .feature-description {
+            color: var(--text-color-light);
+            font-size: 0.95rem; /* Added for better proportions */
+        }
+
+        /* 页脚 */
+        .footer {
+            text-align: center;
+            padding: 1.5rem 0; /* Reduced from 2rem */
+            color: var(--text-color-light);
+            border-top: 1px solid var(--border-color);
+            margin-top: 1.5rem; /* Reduced from 3rem */
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .button {
+                width: 100%;
+                max-width: 250px; /* Reduced from 300px */
+                text-align: center;
+            }
+            
+            /* Added for better mobile spacing */
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header {
+                padding: 1rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <header class="header">
+            <div class="logo-container">
+            <svg class="logo" xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 161.6217803955078" fill="none">
+                <path fill="#8A6DB1" d="M61 86.1962L26.5 106.115C22.5 108.424 17.5 105.537 17.5 100.919L17.5 61.0814C17.5 56.4626 22.5 53.5759 26.5 55.8853L61 75.8038C65 78.1133 65 83.8867 61 86.1962Z"/>
+                <path fill="#8A6DB1" d="M119 53.1962L84.5 73.1147C80.5 75.4241 75.5 72.5374 75.5 67.9186L75.5 28.0814C75.5 23.4626 80.5 20.5759 84.5 22.8853L119 42.8038C123 45.1132 123 50.8868 119 53.1962Z"/>
+                <path fill="#6E5494" d="M72.3109 27.8923L72.3109 67.7295C72.3109 72.3483 67.3109 75.235 63.3109 72.9256L28.8109 53.007C24.8109 50.6976 24.8109 44.9241 28.8109 42.6147L63.3109 22.6962C67.3109 20.3867 72.3109 23.2735 72.3109 27.8923Z"/>
+                <path fill="#6E5494" d="M72.3109 93.8923L72.3109 133.729C72.3109 138.348 67.3109 141.235 63.3109 138.926L28.8109 119.007C24.8109 116.698 24.8109 110.924 28.8109 108.615L63.3109 88.6962C67.3109 86.3867 72.3109 89.2735 72.3109 93.8923Z"/>
+                <circle cx="101" cy="96" r="12" fill="#5A4378"/>
+            </svg>
+            <h1 class="title">eInkViews</h1>
+            <p class="description">为墨水屏设备提供扩展性强,配置极简的信息展示方案</p>
+            
+            <div class="buttons">
+                <!-- GitHub 仓库 -->
+                <a href="https://github.com/Weranry/eInkViews" class="button button-github" target="_blank" rel="noopener noreferrer">
+                    <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                        0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53
+                        .63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95
+                        0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27
+                        1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95
+                        .29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+                    </svg>
+                    GitHub
+                </a>
+                <!-- 查看文档 -->
+                <a href="https://github.com/Weranry/eInkViews" class="button button-outline" target="_blank" rel="noopener noreferrer">
+                    查看文档
+                </a>
+            </div>
+        </header>
+
+        <div class="divider"></div>
+
+        <!-- 特性部分 -->
+        <section class="features">
+            <div class="feature">
+                <h3 class="feature-title">插件灵动</h3>
+                <p class="feature-description">插件体系轻盈扩展，功能模块随需生长</p>
+            </div>
+            <div class="feature">
+                <h3 class="feature-title">尺幅随心</h3>
+                <p class="feature-description">多态视图适配万象，尺寸变换自在随心</p>
+            </div>
+            <div class="feature">
+                <h3 class="feature-title">架构清简</h3>
+                <p class="feature-description">模块经纬分明有序，开发维护举重若轻</p>
+            </div>
+        </section>
+        <!-- 页脚 -->
+        <footer class="footer">
+            <p>MIT 许可 | 版权所有 © 2018-<span id="year"></span><a href="https://weranry.github.io"> Weranry</a></p>
+        </footer>
+    </div>
+
+    <script>
+        (function () {
+            var el = document.getElementById('year');
+            if (el) el.textContent = new Date().getFullYear();
+        })();
+    </script>
+</body>
+</html>
