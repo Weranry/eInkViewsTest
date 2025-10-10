@@ -4,15 +4,19 @@
     {
       "src": "app.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "public/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     {
-      "src": "^/favicon\\.ico$",
+      "src": "/favicon.ico",
       "dest": "/public/favicon.ico"
     },
     {
-      "src": "^/$",
+      "src": "/",
       "dest": "/public/index.html"
     },
     {
