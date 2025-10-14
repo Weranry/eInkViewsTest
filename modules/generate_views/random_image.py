@@ -1,14 +1,14 @@
 import importlib
 from modules.errors.errors import ParamError
 
-def generate_random_image(view_path, code, rotate=0, invert=False, **extra_params):
-    # view_path: "date.kinda", code: "hm"
-    if not code:
-        raise ParamError('缺少 code 参数')
+def generate_random_image(view_path, size, rotate=0, invert=False, **extra_params):
+    # view_path: "date.kinda", size: "hm"
+    if not size:
+        raise ParamError('缺少 size 参数')
     if '.' not in view_path:
         raise ParamError('view_path 格式应为 插件名.视图类')
     plugin, kind = view_path.split('.', 1)
-    mod_path = f'plugins.{plugin}.view.{kind}.{code}'
+    mod_path = f'plugins.{plugin}.view.{kind}.{size}'
     try:
         mod = importlib.import_module(mod_path)
     except ModuleNotFoundError:

@@ -258,6 +258,11 @@
             margin-top: 1.5rem; /* Reduced from 3rem */
         }
 
+        /* 双语切换样式 */
+        [lang="en"] { display: none; }
+        html.en [lang="zh-cn"], html.en [lang="zh-CN"] { display: none !important; }
+        html.en [lang="en"] { display: initial !important; }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .features {
@@ -298,8 +303,14 @@
                 <path fill="#6E5494" d="M72.3109 93.8923L72.3109 133.729C72.3109 138.348 67.3109 141.235 63.3109 138.926L28.8109 119.007C24.8109 116.698 24.8109 110.924 28.8109 108.615L63.3109 88.6962C67.3109 86.3867 72.3109 89.2735 72.3109 93.8923Z"/>
                 <circle cx="101" cy="96" r="12" fill="#5A4378"/>
             </svg>
-            <h1 class="title">eInkViews</h1>
-            <p class="description">为墨水屏设备提供扩展性强,配置极简的信息展示方案</p>
+            <h1 class="title">
+                <span lang="zh-cn">eInkViews</span>
+                <span lang="en">eInkViews</span>
+            </h1>
+            <p class="description">
+                <span lang="zh-cn">为墨水屏设备提供扩展性强,配置极简的信息展示方案</span>
+                <span lang="en">A highly extensible and easy-to-configure information display solution for e-ink devices.</span>
+            </p>
             
             <div class="buttons">
                 <!-- GitHub 仓库 -->
@@ -312,11 +323,13 @@
                         1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95
                         .29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
                     </svg>
-                    GitHub
+                    <span lang="zh-cn">GitHub</span>
+                    <span lang="en">GitHub</span>
                 </a>
                 <!-- 查看文档 -->
                 <a href="https://github.com/Weranry/eInkViews" class="button button-outline" target="_blank" rel="noopener noreferrer">
-                    查看文档
+                    <span lang="zh-cn">查看文档</span>
+                    <span lang="en">Docs</span>
                 </a>
             </div>
         </header>
@@ -326,26 +339,52 @@
         <!-- 特性部分 -->
         <section class="features">
             <div class="feature">
-                <h3 class="feature-title">插件灵动</h3>
-                <p class="feature-description">插件体系轻盈扩展，功能模块随需生长</p>
+                <h3 class="feature-title">
+                    <span lang="zh-cn">插件灵动</span>
+                    <span lang="en">Flexible Plugins</span>
+                </h3>
+                <p class="feature-description">
+                    <span lang="zh-cn">插件体系轻盈扩展，功能模块随需生长</span>
+                    <span lang="en">Lightweight plugin system, easily extensible for any feature.</span>
+                </p>
             </div>
             <div class="feature">
-                <h3 class="feature-title">尺幅随心</h3>
-                <p class="feature-description">多态视图适配万象，尺寸变换自在随心</p>
+                <h3 class="feature-title">
+                    <span lang="zh-cn">尺幅随心</span>
+                    <span lang="en">Adaptive Sizes</span>
+                </h3>
+                <p class="feature-description">
+                    <span lang="zh-cn">多态视图适配万象，尺寸变换自在随心</span>
+                    <span lang="en">Polymorphic views adapt to various screens and sizes with ease.</span>
+                </p>
             </div>
             <div class="feature">
-                <h3 class="feature-title">架构清简</h3>
-                <p class="feature-description">模块经纬分明有序，开发维护举重若轻</p>
+                <h3 class="feature-title">
+                    <span lang="zh-cn">架构清简</span>
+                    <span lang="en">Simplified Architecture</span>
+                </h3>
+                <p class="feature-description">
+                    <span lang="zh-cn">模块经纬分明有序，开发维护举重若轻</span>
+                    <span lang="en">Well-structured modules make development and maintenance effortless.</span>
+                </p>
             </div>
         </section>
         <!-- 页脚 -->
         <footer class="footer">
-            <p>MIT 许可 | 版权所有 © 2018-<span id="year"></span><a href="https://weranry.github.io"> Weranry</a></p>
+            <p>
+                <span lang="zh-cn">MIT 许可 | 版权所有 © 2018-<span id="year"></span><a href="https://weranry.github.io"> Weranry</a></span>
+                <span lang="en">MIT License | Copyright © 2018-<span id="year"></span><a href="https://weranry.github.io"> Weranry</a></span>
+            </p>
         </footer>
     </div>
 
     <script>
+        // 自动切换中英文
         (function () {
+            var lang = (navigator.language || navigator.userLanguage || '').toLowerCase();
+            if (!lang.startsWith('zh')) {
+                document.documentElement.classList.add('en');
+            }
             var el = document.getElementById('year');
             if (el) el.textContent = new Date().getFullYear();
         })();

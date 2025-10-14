@@ -20,8 +20,18 @@
       "dest": "/public/index.html"
     },
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "/app.py"
     }
-  ]
+  ],
+  "functions": {
+    "app.py": {
+      "maxDuration": 10,
+      "memory": 1024
+    }
+  },
+  "regions": ["hkg1"],
+  "env": {
+    "PYTHON_VERSION": "3.9"
+  }
 }

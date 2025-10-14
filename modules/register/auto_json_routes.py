@@ -32,13 +32,16 @@ def register_json_routes(bp, plugin_name, json_module_dir):
                     func = getattr(mod, attr)
                     route_name = attr.replace('to_json', '').lstrip('_') or mod_name
                     route_path = f'/{plugin_name}/json/{route_name}'
-                    def make_json_func(f, plugin_name=plugin_name, route_name=route_name, mod_name=mod_name):
+                    def make_json_func(f=func, plugin_name=plugin_name, route_name=route_name, mod_name=mod_name):
                         def json_func():
-                            # 类型自动转换
+                            # 类型自动转换，只传递专属参数
                             arg_names = f.__code__.co_varnames[:f.__code__.co_argcount]
                             annos = getattr(f, '__annotations__', {})
                             args = []
                             for name in arg_names:
+                                if name in ('size', 'rotate', 'invert'):
+                                    args.append(None)
+                                    continue
                                 val = request.args.get(name, None)
                                 anno = annos.get(name, str)
                                 args.append(_convert_arg(val, anno))
@@ -46,4 +49,4 @@ def register_json_routes(bp, plugin_name, json_module_dir):
                         # endpoint 唯一化
                         json_func.__name__ = f'json_{plugin_name}_{route_name}_{mod_name}'
                         return json_func
-                    bp.add_url_rule(route_path, view_func=make_json_func(func))
+                    bp.add_url_rule(route_path, view_func=make_json_func())

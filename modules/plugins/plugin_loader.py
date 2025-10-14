@@ -3,6 +3,7 @@ import os
 from flask import Flask
 import sys
 import time
+import traceback
 
 def register_plugins(app: Flask, plugins_dir='plugins'):
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
@@ -21,3 +22,4 @@ def register_plugins(app: Flask, plugins_dir='plugins'):
                 print(f'插件 {plugin_name} 加载成功，用时 {elapsed:.3f}s')
             except Exception as e:
                 print(f'插件 {plugin_name} 加载失败: {e}')
+                traceback.print_exc()
