@@ -22,10 +22,12 @@
     {
       "src": "/api/(.*)",
       "dest": "/app.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/app.py",
+      "regions": ["hkg1"]
     }
-  ],
-  "regions": ["hkg1"],
-  "env": {
-    "PYTHON_VERSION": "3.9"
-  }
+  ]
 }
+
