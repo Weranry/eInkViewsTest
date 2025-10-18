@@ -16,3 +16,16 @@ DEFAULT_INVERT = False
 
 # 默认图片质量（JPEG）
 DEFAULT_IMAGE_QUALITY = 100
+
+# HTTP缓存配置
+# 视图缓存时间（秒）
+VIEW_CACHE_MAX_AGE = 300  # 5分钟
+
+# 随机视图缓存时间（秒）
+RANDOM_VIEW_CACHE_MAX_AGE = 60  # 1分钟
+
+# 字体缓存大小
+FONT_CACHE_SIZE = 128
+
+# 模块导入缓存大小
+MODULE_IMPORT_CACHE_SIZE = 256

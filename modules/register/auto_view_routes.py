@@ -1,9 +1,24 @@
 import importlib
 import io
 import os
-from flask import send_file, request
+import hashlib
+from flask import send_file, request, make_response
+from functools import lru_cache
 from modules.errors.errors import ParamError
-from config import DEFAULT_IMAGE_QUALITY, DEFAULT_ROTATE, DEFAULT_INVERT
+from config import DEFAULT_IMAGE_QUALITY, DEFAULT_ROTATE, DEFAULT_INVERT, VIEW_CACHE_MAX_AGE, MODULE_IMPORT_CACHE_SIZE
+
+# 缓存已导入的模块
+@lru_cache(maxsize=MODULE_IMPORT_CACHE_SIZE)
+def _import_view_module(module_path):
+    """缓存模块导入以提高性能"""
+    return importlib.import_module(module_path)
+
+def _generate_etag(plugin_name, kind, size, **params):
+    """生成ETag用于HTTP缓存"""
+    # 将所有参数排序后组合成字符串
+    param_str = ''.join(f'{k}={v}' for k, v in sorted(params.items()))
+    etag_source = f'{plugin_name}:{kind}:{size}:{param_str}'
+    return hashlib.md5(etag_source.encode()).hexdigest()
 
 def register_view_routes(bp, plugin_name, view_dir):
     # 遍历 view_dir 下所有子目录（视图类）
@@ -18,7 +33,7 @@ def register_view_routes(bp, plugin_name, view_dir):
                 if not size:
                     raise ParamError('缺少 size 参数')
                 try:
-                    mod = importlib.import_module(f'plugins.{plugin_name}.view.{kind}.{size}')
+                    mod = _import_view_module(f'plugins.{plugin_name}.view.{kind}.{size}')
                 except ModuleNotFoundError:
                     raise ParamError(f'视图 {plugin_name}.view.{kind}.{size} 不存在')
                 if not hasattr(mod, 'generate_image'):
@@ -40,6 +55,17 @@ def register_view_routes(bp, plugin_name, view_dir):
                     k: v for k, v in request.args.items()
                     if k not in ('size', 'rotate', 'invert')
                 }
+                
+                # 生成ETag用于HTTP缓存
+                all_params = {'rotate': rotate, 'invert': invert, **plugin_args}
+                etag = _generate_etag(plugin_name, kind, size, **all_params)
+                
+                # 检查客户端缓存
+                if request.headers.get('If-None-Match') == etag:
+                    response = make_response('', 304)
+                    response.headers['ETag'] = etag
+                    return response
+                
                 try:
                     img = mod.generate_image(rotate=rotate, invert=invert, **plugin_args)
                 except Exception as e:
@@ -47,7 +73,10 @@ def register_view_routes(bp, plugin_name, view_dir):
                 buf = io.BytesIO()
                 img.save(buf, format='JPEG', quality=DEFAULT_IMAGE_QUALITY, subsampling=0, progressive=False)
                 buf.seek(0)
-                return send_file(buf, mimetype='image/jpeg')
+                response = make_response(send_file(buf, mimetype='image/jpeg'))
+                response.headers['ETag'] = etag
+                response.headers['Cache-Control'] = f'public, max-age={VIEW_CACHE_MAX_AGE}'
+                return response
             view_func.__name__ = f'view_{plugin_name}_{kind}'
             return view_func
         bp.add_url_rule(f'/{plugin_name}/view/{kind}', view_func=make_view_func())

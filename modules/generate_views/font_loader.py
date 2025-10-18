@@ -1,6 +1,9 @@
 from PIL import ImageFont
 import os
+from functools import lru_cache
+from config import FONT_CACHE_SIZE
 
+@lru_cache(maxsize=FONT_CACHE_SIZE)
 def load_font(size, font_path):
     # font_path 必须由用户指定（相对根目录或绝对路径）
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))
