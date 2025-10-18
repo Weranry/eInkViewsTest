@@ -1,5 +1,13 @@
 import importlib
+from functools import lru_cache
 from modules.errors.errors import ParamError
+from config import MODULE_IMPORT_CACHE_SIZE
+
+# 缓存已导入的模块
+@lru_cache(maxsize=MODULE_IMPORT_CACHE_SIZE)
+def _import_view_module(module_path):
+    """缓存模块导入以提高性能"""
+    return importlib.import_module(module_path)
 
 def generate_random_image(view_path, size, rotate=0, invert=False, **extra_params):
     # view_path: "date.kinda", size: "hm"
@@ -10,7 +18,7 @@ def generate_random_image(view_path, size, rotate=0, invert=False, **extra_param
     plugin, kind = view_path.split('.', 1)
     mod_path = f'plugins.{plugin}.view.{kind}.{size}'
     try:
-        mod = importlib.import_module(mod_path)
+        mod = _import_view_module(mod_path)
     except ModuleNotFoundError:
         raise ParamError(f'视图 {mod_path} 不存在')
     if not hasattr(mod, 'generate_image'):
