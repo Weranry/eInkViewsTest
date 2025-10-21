@@ -1,13 +1,13 @@
 import importlib
 from functools import lru_cache
 from modules.errors.errors import ParamError
-from config import MODULE_IMPORT_CACHE_SIZE
+from config import MODULE_IMPORT_CACHE_SIZE, ENABLE_MODULE_IMPORT_CACHE
 
-# 缓存已导入的模块
-@lru_cache(maxsize=MODULE_IMPORT_CACHE_SIZE)
 def _import_view_module(module_path):
-    """缓存模块导入以提高性能"""
     return importlib.import_module(module_path)
+
+if ENABLE_MODULE_IMPORT_CACHE:
+    _import_view_module = lru_cache(maxsize=MODULE_IMPORT_CACHE_SIZE)(_import_view_module)
 
 def generate_random_image(view_path, size, rotate=0, invert=False, **extra_params):
     # view_path: "date.kinda", size: "hm"

@@ -5,13 +5,14 @@ import hashlib
 from flask import send_file, request, make_response
 from functools import lru_cache
 from modules.errors.errors import ParamError
-from config import DEFAULT_IMAGE_QUALITY, DEFAULT_ROTATE, DEFAULT_INVERT, VIEW_CACHE_MAX_AGE, MODULE_IMPORT_CACHE_SIZE
+from config import DEFAULT_IMAGE_QUALITY, DEFAULT_ROTATE, DEFAULT_INVERT, VIEW_CACHE_MAX_AGE, MODULE_IMPORT_CACHE_SIZE, ENABLE_VIEW_CACHE, ENABLE_MODULE_IMPORT_CACHE
 
 # 缓存已导入的模块
-@lru_cache(maxsize=MODULE_IMPORT_CACHE_SIZE)
 def _import_view_module(module_path):
-    """缓存模块导入以提高性能"""
     return importlib.import_module(module_path)
+
+if ENABLE_MODULE_IMPORT_CACHE:
+    _import_view_module = lru_cache(maxsize=MODULE_IMPORT_CACHE_SIZE)(_import_view_module)
 
 def _generate_etag(plugin_name, kind, size, **params):
     """生成ETag用于HTTP缓存"""
@@ -61,7 +62,7 @@ def register_view_routes(bp, plugin_name, view_dir):
                 etag = _generate_etag(plugin_name, kind, size, **all_params)
                 
                 # 检查客户端缓存
-                if request.headers.get('If-None-Match') == etag:
+                if ENABLE_VIEW_CACHE and request.headers.get('If-None-Match') == etag:
                     response = make_response('', 304)
                     response.headers['ETag'] = etag
                     return response
@@ -74,8 +75,11 @@ def register_view_routes(bp, plugin_name, view_dir):
                 img.save(buf, format='JPEG', quality=DEFAULT_IMAGE_QUALITY, subsampling=0, progressive=False)
                 buf.seek(0)
                 response = make_response(send_file(buf, mimetype='image/jpeg'))
-                response.headers['ETag'] = etag
-                response.headers['Cache-Control'] = f'public, max-age={VIEW_CACHE_MAX_AGE}'
+                # 优先使用视图模块自定义缓存时间
+                cache_max_age = getattr(mod, 'CACHE_MAX_AGE', VIEW_CACHE_MAX_AGE)
+                if ENABLE_VIEW_CACHE:
+                    response.headers['ETag'] = etag
+                    response.headers['Cache-Control'] = f'public, max-age={cache_max_age}'
                 return response
             view_func.__name__ = f'view_{plugin_name}_{kind}'
             return view_func

@@ -3,7 +3,7 @@ import hashlib
 from flask import Blueprint, request, send_file, make_response
 from modules.generate_views.random_image import generate_random_image
 from modules.errors.errors import ParamError
-from config import DEFAULT_IMAGE_QUALITY, RANDOM_VIEW_CACHE_MAX_AGE
+from config import DEFAULT_IMAGE_QUALITY, RANDOM_VIEW_CACHE_MAX_AGE, ENABLE_RANDOM_VIEW_CACHE
 
 bp_random = Blueprint('random_views', __name__)
 
@@ -73,7 +73,7 @@ def random_views():
     etag = _generate_random_etag(routes_param, rotate_arg, invert_arg)
     
     # 检查客户端缓存
-    if request.headers.get('If-None-Match') == etag:
+    if ENABLE_RANDOM_VIEW_CACHE and request.headers.get('If-None-Match') == etag:
         response = make_response('', 304)
         response.headers['ETag'] = etag
         return response
@@ -101,6 +101,12 @@ def random_views():
             else (global_invert if invert_val is None else False)
         )
         extra_params = params
+        # 获取视图模块
+        plugin, kind = view_path.split('.', 1)
+        mod_path = f'plugins.{plugin}.view.{kind}.{size}'
+        import importlib
+        mod = importlib.import_module(mod_path)
+        cache_max_age = getattr(mod, 'CACHE_MAX_AGE', RANDOM_VIEW_CACHE_MAX_AGE)
         img = generate_random_image(view_path, size=size, rotate=rotate, invert=invert, **extra_params)
     except Exception as e:
         raise ParamError(f'随机图片生成失败: {str(e)}')
@@ -108,6 +114,7 @@ def random_views():
     img.save(buf, format='JPEG', quality=DEFAULT_IMAGE_QUALITY, subsampling=0, progressive=False)
     buf.seek(0)
     response = make_response(send_file(buf, mimetype='image/jpeg'))
-    response.headers['ETag'] = etag
-    response.headers['Cache-Control'] = f'public, max-age={RANDOM_VIEW_CACHE_MAX_AGE}'
+    if ENABLE_RANDOM_VIEW_CACHE:
+        response.headers['ETag'] = etag
+        response.headers['Cache-Control'] = f'public, max-age={cache_max_age}'
     return response

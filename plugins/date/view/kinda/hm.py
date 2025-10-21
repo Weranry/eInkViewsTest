@@ -1,6 +1,8 @@
 from .utils import prepare_canvas, finalize_image, get_date_text
 from modules.generate_views.qrcode_util import generate_qrcode
 
+CACHE_MAX_AGE = 100  # 单独设置本视图缓存时间为 100 秒
+
 def generate_image(rotate=0, invert=False, tz=None):
     img, draw, font = prepare_canvas('hm', font_size=48)
     date_text = get_date_text(tz=tz)
